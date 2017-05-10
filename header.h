@@ -222,4 +222,61 @@ void menorCaminho_Grafo(Grafo *gr, int ini, int *ant, float *dist){
     free(visitado);
 }
 
-void BoruvkaAlgorithm(Grafo *gr);
+void BoruvkaAlgorithm(Grafo *gr, int orig, int *pai)
+/*-INICIALMENTE, CADA VÉRTICE É UMA ÁRVORE
+  -CADA ITERAÇÃO PROCURAR A MENOR ARESTA QUE UNE 2 ARVORES
+  -PROCESSO TERMINA QUANDO SE TEM SÓ UMA ARVORE
+*/
+{
+    int i, j, dest, primeiro, NV = gr->nro_Vertice;
+    double menorPeso;
+    int *arv = (int*)malloc(NV*sizeof(int));
+    for(i=0; i < NV; i++)
+    {
+        arv[i]= i;   //cada   vertice vira uma arvore
+        pai[i]= -1;  //logo n tem pai
+    }
+    pai[orig]=orig;
+    while(1)
+    {
+        primeiro = 1;
+        //percore todos os vertices
+        for(i=0;i<NV;i++)
+        {
+            //procura a aresta de menor custo
+            for(j=0;j<gr->grau[i];j++)
+            {
+                if(arv[i] != arv[gr->arestas[i][j]])
+                {
+                    if(primeiro)
+                    {
+                        menorPeso = gr->pesos[i][j];
+                        orig = i;
+                        dest = gr->arestas[i][j];
+                        primeiro = 0;
+                    }else
+                    {
+                        if(menorPeso > gr->pesos[i][j])
+                        {
+                            menorPeso = gr->pesos[i][j];
+                            orig = i;
+                            dest = gr->arestas[i][j];
+                        }
+                    }
+                }
+            }
+        }
+        if(primeiro == 1)break;
+        if(pai[orig]== -1)
+            pai[orig] = dest;
+        else pai[dest] = orig;
+        for(i=0;i < NV;i++)
+            if(arv[i] == arv[dest])
+                arv[i] = arv[orig];
+        
+    }
+    for(i=0;i<gr->nro_Vertice;i++)
+    {
+        printf("%d: %d\n",pai[i],i);
+    }
+}
